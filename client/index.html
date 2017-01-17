@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      body {
+        background-color: black;
+        color: white;
+      }
+      textarea {
+        background-color: inherit;
+        color: inherit;
+      }
+      textarea.active {
+        background-color: rgba(255,255,255,0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script src="js/osc-browser.js"></script>
+    <script src="js/webmidi.js"></script>
+    <script>
+      var oscPort = new osc.WebSocketPort({
+          url: "ws://localhost:8000" // URL to your Web Socket server.
+      });
+      // Opening the Port:
+      oscPort.open();
+      // Listening for incoming OSC messages:
+      oscPort.on("message", function (oscMsg) {
+          console.log("An OSC message just arrived!", oscMsg);
+      });
+      // Sending OSC messages:
+      // For most Ports, send() should only be called after the "open" event fires.
+      function runSonicCode(code){
+        if(code == "STOP"){
+          oscPort.send({
+            address: "/stop-all-jobs",
+            args: []
+          });
+        }
+        else if (code[0]=="/"){
+          var things = code.split();
+          oscPort.send({
+            address: things[0],
+            args: things.slice(1)
+          });
+        }
+        else{
+          oscPort.send({
+            address: "/run-code",
+            args: [1, "" + code]
+          });
+        }
+      }
+    </script>
+    <script>
+      // Build grid
+      result = "";
+      var grid;
+      try{
+        grid = JSON.parse(localStorage.grid);
+      }
+      catch(e){
+        grid = false;
+      }
+      for(var i=1;i<=8;i++){
+        result += `<div>`
+        for(var j=1;j<=8;j++){
+          result += `<textarea cols="15" rows="7" id="c${i}${j}" onkeyup="savegrid()">${grid?grid[i-1][j-1]:""}</textarea>`
+        }
+        result += `</div>`
+      }
+      document.getElementById("container").innerHTML = result;
+
+      function savegrid(){
+        var grid = [];
+        for(var i=1;i<=8;i++){
+          grid.push([]);
+          for(var j=1;j<=8;j++){
+            grid[i-1].push(getElementByGridPos([i,j]).value || "");
+          }
+        }
+        console.log(grid)
+        localStorage.grid = JSON.stringify(grid);
+      }
+
+      // Time for midi
+      WebMidi.enable(function (err) {
+
+        if (err) {
+          console.log("WebMidi could not be enabled.", err);
+        } else {
+          console.log("WebMidi enabled!");
+
+          console.log(WebMidi.inputs);
+          console.log(WebMidi.outputs);
+
+          console.log(input = WebMidi.getInputByName("Launchpad Pro MIDI 2"))
+          console.log(output = WebMidi.getOutputByName("Launchpad Pro MIDI 2"))
+
+          input.addListener('noteon', "all", function(e) {
+            console.log(e.note.number);
+            var pos = noteNumberToGridpos(e.note.number);
+            if(inGrid(pos)){
+              var code = getElementByGridPos(pos).value;
+              if(code){ runSonicCode(code) };
+              getElementByGridPos(pos).setAttribute("class", "active");
+              output.playNote(e.note.number, "all", {velocity: 1/127});
+            }
+          });
+          input.addListener('noteoff', "all", function(e) {
+            var pos = noteNumberToGridpos(e.note.number);
+            if(inGrid(pos)){
+              getElementByGridPos(pos).setAttribute("class", "");
+              output.playNote(e.note.number, "all", {velocity: 0});
+            }
+          });
+        }
+
+      });
+
+      function noteNumberToGridpos(noteNumber){
+        return [9-Math.floor(noteNumber/10),noteNumber%10]
+      }
+      function getElementByGridPos(pos){
+        return document.getElementById("c"+pos[0]+pos[1]);
+      }
+      function inGrid(pos){
+        return 1<=pos[0]&&pos[0]<=8&&1<=pos[1]&&pos[1]<=8;
+      }
+    </script>
+  </body>
+</html>
