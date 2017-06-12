@@ -6,8 +6,6 @@ SonicPi Commander is a software bridge that executes [SonicPi](http://sonic-pi.n
 
 ![](SonicPiCommanderSummary.gif)
 
-Click the GIF to view it in higher quality.
-
 ![](SonicPiCommanderInterface.png)
 
 The SonicPi Commander interface is largely unassuming, consisting of a grid of 8 x 8 freely editable text fields that mirror the Launchpad's layout. Pressing a pad on the Launchpad executes the code in the corresponding text field. With minimal code, one can easily program a pad to trigger notes, samples, chords, or even loops à la Ableton Live. However, why stop there? With the ability to edit code, practically any behavior can be created, not just those found in traditional music software. How about, say, playing a random chord when a pad is pressed? A sample that gets faster every time it is played? An effect switcher that cycles through effects? Why not program all of the above, in real time? SonicPi Commander is simultaneously an instrument and a blank canvas; it is up to the user to code, customize, and ultimately, perform.
