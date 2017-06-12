@@ -2,7 +2,7 @@
 
 SonicPi Commander is a software bridge that executes [SonicPi](http://sonic-pi.net/) code snippets using a MIDI controller. Designed for a [Novation Launchpad](https://us.novationmusic.com/launch/launchpad), SonicPi Commander blurs the lines between livecoding, [controller scripting](https://rbnrpi.wordpress.com/2016/04/01/a-completely-different-way-to-use-sonic-pi-with-a-midi-controller/), and sampling.
 
-[Watch Video](https://www.youtube.com/watch?v=BRSSNtuW618)
+[Watch the Video](https://www.youtube.com/watch?v=BRSSNtuW618)
 
 ![](SonicPiCommanderSummary.gif)
 
